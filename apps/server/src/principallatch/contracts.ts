@@ -119,8 +119,7 @@ export type SecurityRejectionCode =
   | "DENY_MANDATE_BINDING"
   | "DENY_MANDATE_LIFECYCLE"
   | "DENY_PROFILE_COMMITMENT"
-  | "DENY_REVISION_COMMITMENT"
-  | "DENY_AUDIT_UNAVAILABLE";
+  | "DENY_REVISION_COMMITMENT";
 
 export interface SecurityRejection {
   eventType: "security_rejection";

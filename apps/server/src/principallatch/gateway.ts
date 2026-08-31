@@ -3,6 +3,7 @@ import type { AuditWriter } from "./audit.js";
 import { AuthorityService } from "./authority.js";
 import type {
   AgentPassportClaims,
+  AuthorizationReasonCode,
   AuthorizationDecision,
   ResourceOutcome,
   SecurityRejection,
@@ -11,6 +12,10 @@ import type {
 import { PassportBroker, PassportError } from "./passport.js";
 import { AuthorityVerificationError } from "./profile.js";
 import { ProtectedContentProvider, ResourceCatalog } from "./resources.js";
+
+export type GatewayPolicyDenialCode =
+  | Exclude<AuthorizationReasonCode, "ALLOW_SCOPE_RULE">
+  | SecurityRejectionCode;
 
 export type GatewayReadResult =
   | {
@@ -46,11 +51,23 @@ export type GatewayReadResult =
     }
   | {
       ok: false;
-      statusCode: 403 | 503;
+      statusCode: 403;
       requestId: string;
       decision: "deny";
-      code: string;
-      error: string;
+      outcome: "not_attempted";
+      providerAttempted: false;
+      code: GatewayPolicyDenialCode;
+      error: "Access denied";
+    }
+  | {
+      ok: false;
+      statusCode: 503;
+      requestId: string;
+      decision: "deny";
+      outcome: "not_attempted";
+      providerAttempted: false;
+      code: "DENY_AUDIT_UNAVAILABLE";
+      error: "Gateway unavailable";
     };
 
 export class PrincipalLatchGateway {
@@ -96,8 +113,8 @@ export class PrincipalLatchGateway {
         null,
         null,
       );
-      if (!recorded) return denied(requestId, 503, "DENY_AUDIT_UNAVAILABLE");
-      return denied(requestId, 403, rejection.code);
+      if (!recorded) return preAccessAuditUnavailable(requestId);
+      return policyDenied(requestId, rejection.code);
     }
 
     let verified;
@@ -119,8 +136,8 @@ export class PrincipalLatchGateway {
         claims,
         this.authority.getCurrent(claims.mandate_id)?.revision ?? null,
       );
-      if (!recorded) return denied(requestId, 503, "DENY_AUDIT_UNAVAILABLE");
-      return denied(requestId, 403, code);
+      if (!recorded) return preAccessAuditUnavailable(requestId);
+      return policyDenied(requestId, code);
     }
 
     const resource = this.catalog.lookup(resourceId);
@@ -137,9 +154,9 @@ export class PrincipalLatchGateway {
         reasonCode: "DENY_RESOURCE_NOT_ACCESSIBLE",
       });
       if (!(await this.appendDenyEvidence(event, claims, resourceId, "Resource was not available to the verified principal"))) {
-        return denied(requestId, 503, "DENY_AUDIT_UNAVAILABLE");
+        return preAccessAuditUnavailable(requestId);
       }
-      return denied(requestId, 403, "DENY_RESOURCE_NOT_ACCESSIBLE");
+      return policyDenied(requestId, "DENY_RESOURCE_NOT_ACCESSIBLE");
     }
 
     const rule = verified.profile.rules[0];
@@ -153,8 +170,8 @@ export class PrincipalLatchGateway {
         claims,
         verified.record.revision,
       );
-      if (!recorded) return denied(requestId, 503, "DENY_AUDIT_UNAVAILABLE");
-      return denied(requestId, 403, "DENY_PROFILE_COMMITMENT");
+      if (!recorded) return preAccessAuditUnavailable(requestId);
+      return policyDenied(requestId, "DENY_PROFILE_COMMITMENT");
     }
     const ownerMatches = resource.ownerPrincipalId === claims.act;
     const ruleMatches =
@@ -179,16 +196,16 @@ export class PrincipalLatchGateway {
       decision,
       reasonCode,
     });
-    if (decision === "deny") {
+    if (reasonCode !== "ALLOW_SCOPE_RULE") {
       if (!(await this.appendDenyEvidence(
         event,
         claims,
         resourceId,
         "Protected content provider was not called",
       ))) {
-        return denied(requestId, 503, "DENY_AUDIT_UNAVAILABLE");
+        return preAccessAuditUnavailable(requestId);
       }
-      return denied(requestId, 403, reasonCode);
+      return policyDenied(requestId, reasonCode);
     }
     const attempting = this.buildOutcome({
       requestId,
@@ -198,7 +215,7 @@ export class PrincipalLatchGateway {
       detail: "Authorized provider read is about to be attempted",
     });
     if (!(await this.appendEvents([event, attempting]))) {
-      return denied(requestId, 503, "DENY_AUDIT_UNAVAILABLE");
+      return preAccessAuditUnavailable(requestId);
     }
 
     let content: string;
@@ -231,8 +248,8 @@ export class PrincipalLatchGateway {
           claims,
           this.authority.getCurrent(claims.mandate_id)?.revision ?? null,
         );
-        if (!recorded) return denied(requestId, 503, "DENY_AUDIT_UNAVAILABLE");
-        return denied(requestId, 403, code);
+        if (!recorded) return preAccessAuditUnavailable(requestId);
+        return policyDenied(requestId, code);
       }
       const outcomeRecorded = await this.appendOutcome({
         requestId,
@@ -431,17 +448,31 @@ function terminalOutcomeUnavailable(requestId: string): GatewayReadResult {
   };
 }
 
-function denied(
+function policyDenied(
   requestId: string,
-  statusCode: 403 | 503,
-  code: string,
+  code: GatewayPolicyDenialCode,
 ): GatewayReadResult {
   return {
     ok: false,
-    statusCode,
+    statusCode: 403,
     requestId,
     decision: "deny",
+    outcome: "not_attempted",
+    providerAttempted: false,
     code,
-    error: statusCode === 403 ? "Access denied" : "Gateway unavailable",
+    error: "Access denied",
+  };
+}
+
+function preAccessAuditUnavailable(requestId: string): GatewayReadResult {
+  return {
+    ok: false,
+    statusCode: 503,
+    requestId,
+    decision: "deny",
+    outcome: "not_attempted",
+    providerAttempted: false,
+    code: "DENY_AUDIT_UNAVAILABLE",
+    error: "Gateway unavailable",
   };
 }

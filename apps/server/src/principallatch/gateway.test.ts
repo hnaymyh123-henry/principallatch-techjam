@@ -50,6 +50,9 @@ describe("PrincipalLatch protected resource boundary", () => {
     expect(bob).toMatchObject({
       ok: false,
       statusCode: 403,
+      decision: "deny",
+      outcome: "not_attempted",
+      providerAttempted: false,
       code: "DENY_OWNER_MISMATCH",
     });
     expect(test.principalLatch.contentProvider.readCount("bob-payroll-001")).toBe(0);
@@ -65,6 +68,9 @@ describe("PrincipalLatch protected resource boundary", () => {
     expect(revoked).toMatchObject({
       ok: false,
       statusCode: 403,
+      decision: "deny",
+      outcome: "not_attempted",
+      providerAttempted: false,
       code: "DENY_MANDATE_LIFECYCLE",
     });
     expect(test.principalLatch.contentProvider.readCount("alice-doc-001")).toBe(1);
@@ -138,6 +144,9 @@ describe("PrincipalLatch protected resource boundary", () => {
     expect(result).toMatchObject({
       ok: false,
       statusCode: 503,
+      decision: "deny",
+      outcome: "not_attempted",
+      providerAttempted: false,
       code: "DENY_AUDIT_UNAVAILABLE",
     });
     expect(test.principalLatch.contentProvider.readCount("alice-doc-001")).toBe(0);

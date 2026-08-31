@@ -1,0 +1,47 @@
+{
+  "name": "principallatch-techjam",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hnaymyh123-henry/principallatch-techjam.git"
+  },
+  "homepage": "https://github.com/hnaymyh123-henry/principallatch-techjam#readme",
+  "contributors": [
+    "Henry Ma"
+  ],
+  "description": "PrincipalLatch identity and revocable authorization middleware for the TikTok TechJam Bouncer track.",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "predev": "npm run build -w @principallatch/core",
+    "dev": "concurrently -n server,web -c cyan,magenta \"npm run dev -w @principallatch/server\" \"npm run dev -w @principallatch/web\"",
+    "build": "npm run build -w @principallatch/core && npm run build -w @principallatch/web && npm run build -w @principallatch/server",
+    "typecheck": "npm run typecheck -w @principallatch/core && npm run build -w @principallatch/core && npm run typecheck -w @principallatch/server && npm run typecheck -w @principallatch/web",
+    "test": "npm run build -w @principallatch/core && npm run test -w @principallatch/core && npm run test -w @principallatch/server",
+    "check": "npm run typecheck && npm run test && npm run build && npm run test:poc-launcher && npm run check:docs",
+    "check:docs": "node ./scripts/check-doc-links.mjs",
+    "verify:demo": "npm run build -w @principallatch/core && npm run build -w @principallatch/server && node apps/server/dist/verify-demo.js",
+    "poc": "node ./scripts/start-local-poc.mjs",
+    "test:poc-launcher": "node --test ./scripts/start-local-poc.test.mjs",
+    "start": "npm run start -w @principallatch/server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "tsup": {
+      ".": "$tsup",
+      "esbuild": "0.28.2"
+    }
+  }
+}

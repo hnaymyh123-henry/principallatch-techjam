@@ -26,7 +26,27 @@ export type GatewayReadResult =
     }
   | {
       ok: false;
-      statusCode: 403 | 502 | 503;
+      statusCode: 502;
+      requestId: string;
+      decision: "allow";
+      outcome: "failed";
+      providerAttempted: true;
+      code: "RESOURCE_PROVIDER_FAILED";
+      error: string;
+    }
+  | {
+      ok: false;
+      statusCode: 503;
+      requestId: string;
+      decision: "allow";
+      outcome: "indeterminate";
+      providerAttempted: true;
+      code: "OUTCOME_AUDIT_UNAVAILABLE";
+      error: string;
+    }
+  | {
+      ok: false;
+      statusCode: 403 | 503;
       requestId: string;
       decision: "deny";
       code: string;
@@ -222,9 +242,9 @@ export class PrincipalLatchGateway {
         detail: "Protected content provider failed",
       });
       if (!outcomeRecorded) {
-        return denied(requestId, 503, "DENY_AUDIT_UNAVAILABLE");
+        return terminalOutcomeUnavailable(requestId);
       }
-      return denied(requestId, 502, "RESOURCE_PROVIDER_FAILED");
+      return providerFailed(requestId);
     }
     const outcomeRecorded = await this.appendOutcome({
       requestId,
@@ -234,7 +254,7 @@ export class PrincipalLatchGateway {
       detail: "Protected content was read after authorization",
     });
     if (!outcomeRecorded) {
-      return denied(requestId, 503, "DENY_AUDIT_UNAVAILABLE");
+      return terminalOutcomeUnavailable(requestId);
     }
     return {
       ok: true,
@@ -385,9 +405,35 @@ export class PrincipalLatchGateway {
   }
 }
 
+function providerFailed(requestId: string): GatewayReadResult {
+  return {
+    ok: false,
+    statusCode: 502,
+    requestId,
+    decision: "allow",
+    outcome: "failed",
+    providerAttempted: true,
+    code: "RESOURCE_PROVIDER_FAILED",
+    error: "Provider access was authorized, but the provider failed",
+  };
+}
+
+function terminalOutcomeUnavailable(requestId: string): GatewayReadResult {
+  return {
+    ok: false,
+    statusCode: 503,
+    requestId,
+    decision: "allow",
+    outcome: "indeterminate",
+    providerAttempted: true,
+    code: "OUTCOME_AUDIT_UNAVAILABLE",
+    error: "Provider access was attempted, but its terminal outcome could not be audited",
+  };
+}
+
 function denied(
   requestId: string,
-  statusCode: 403 | 502 | 503,
+  statusCode: 403 | 503,
   code: string,
 ): GatewayReadResult {
   return {

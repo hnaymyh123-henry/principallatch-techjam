@@ -123,13 +123,19 @@ transactional store, use managed keys with rotation, add workload attestation
 and sender-constrained credentials, enforce an egress allowlist, and expose the
 same boundary as reusable HTTP/MCP middleware for multiple Agent runtimes.
 
-## Built with
+## Development tools, APIs, assets, and libraries
 
-- TypeScript and Node.js 22
-- Fastify, React 19, and Vite
-- Codex CLI and the Volcengine Ark Responses API
-- Ed25519, compact JWS, and SHA-256
-- Zod, Vitest, Docker/Podman, and GitHub Actions
+- **Development tools:** TypeScript, Node.js 22, npm workspaces, Codex CLI,
+  Docker/Podman, and GitHub Actions.
+- **APIs:** the Volcengine Ark OpenAI-compatible Responses API and
+  PrincipalLatch's competition-authored Fastify HTTP Gateway.
+- **Assets:** the UI, favicon, architecture diagram, and generated mock
+  document canaries were authored for this entry. No third-party media or
+  personal/production data is included.
+- **Libraries:** Fastify, React 19, Vite, Zod, Vitest, `@noble/ed25519`, and
+  standard Node.js cryptography. Direct dependencies retain their upstream
+  licenses; the organizer scaffold and PrincipalLatch code are disclosed in
+  [`PREEXISTING.md`](../PREEXISTING.md) and [`LICENSE`](../LICENSE).
 
 ## Testing instructions
 

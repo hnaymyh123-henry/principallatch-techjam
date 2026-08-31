@@ -25,7 +25,7 @@
     "dev": "concurrently -n server,web -c cyan,magenta \"npm run dev -w @principallatch/server\" \"npm run dev -w @principallatch/web\"",
     "build": "npm run build -w @principallatch/core && npm run build -w @principallatch/web && npm run build -w @principallatch/server",
     "typecheck": "npm run typecheck -w @principallatch/core && npm run build -w @principallatch/core && npm run typecheck -w @principallatch/server && npm run typecheck -w @principallatch/web",
-    "test": "npm run build -w @principallatch/core && npm run test -w @principallatch/core && npm run test -w @principallatch/server",
+    "test": "npm run build -w @principallatch/core && npm run test -w @principallatch/core && npm run test -w @principallatch/server && npm run test -w @principallatch/web",
     "check": "npm run typecheck && npm run test && npm run build && npm run test:poc-launcher && npm run check:docs",
     "check:docs": "node ./scripts/check-doc-links.mjs",
     "verify:demo": "npm run build -w @principallatch/core && npm run build -w @principallatch/server && node apps/server/dist/verify-demo.js",

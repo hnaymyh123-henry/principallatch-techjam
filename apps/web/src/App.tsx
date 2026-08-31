@@ -18,7 +18,7 @@ const emptyForm = {
     "Help me build and test software in this workspace. Keep changes small and explain the result.",
 };
 
-interface AuditRow {
+export interface AuditRow {
   requestId: string;
   occurredAt: string;
   humanPrincipalId: string | null;
@@ -26,7 +26,7 @@ interface AuditRow {
   action: string;
   resourceId: string;
   decision: "allow" | "deny" | "rejected";
-  outcome: "succeeded" | "failed" | "not_attempted" | "pending";
+  outcome: "succeeded" | "failed" | "not_attempted" | "unconfirmed";
   reason: string;
   detail: string;
   providerReadCount: number | null;
@@ -60,7 +60,7 @@ function humanize(value: string): string {
   return value.toLowerCase().replaceAll("_", " ");
 }
 
-function buildAuditRows(events: AuditEvent[]): AuditRow[] {
+export function buildAuditRows(events: AuditEvent[]): AuditRow[] {
   const rows = new Map<string, AuditRow>();
   for (const event of events) {
     const current = rows.get(event.requestId) ?? {
@@ -71,7 +71,7 @@ function buildAuditRows(events: AuditEvent[]): AuditRow[] {
       action: "document.read",
       resourceId: "",
       decision: "rejected" as const,
-      outcome: "pending" as const,
+      outcome: "unconfirmed" as const,
       reason: "PENDING",
       detail: "",
       providerReadCount: null,
@@ -97,8 +97,14 @@ function buildAuditRows(events: AuditEvent[]): AuditRow[] {
       current.detail = event.detail;
     } else {
       current.resourceId = current.resourceId || event.resourceId;
-      current.outcome = event.status === "attempting" ? "pending" : event.status;
-      current.providerReadCount = event.providerReadCount;
+      if (event.status === "attempting") {
+        if (current.outcome === "unconfirmed") {
+          current.providerReadCount = null;
+        }
+      } else {
+        current.outcome = event.status;
+        current.providerReadCount = event.providerReadCount;
+      }
       current.detail = current.detail
         ? `${current.detail} · ${event.detail}`
         : event.detail;
@@ -972,7 +978,7 @@ export default function App() {
                             <td><strong>{shortId(row.humanPrincipalId, 12)}</strong><span>{shortId(row.agentPrincipalId, 18)}</span><small>{formatTime(row.occurredAt)}</small></td>
                             <td><strong>{row.resourceId}</strong><span>{row.action}</span><small title={row.requestId}>req {shortId(row.requestId, 7)}</small></td>
                             <td><span className={"decision-badge decision-" + row.decision}>{row.decision}</span><small title={row.detail}>{humanize(row.reason)}</small></td>
-                            <td><span className={"outcome-badge outcome-" + row.outcome}>{humanize(row.outcome)}</span><small>read count <b>{row.providerReadCount ?? "—"}</b></small></td>
+                            <td><span className={"outcome-badge outcome-" + row.outcome} title={row.outcome === "unconfirmed" ? "No persisted terminal provider outcome yet" : undefined}>{humanize(row.outcome)}</span><small>read count <b>{row.providerReadCount ?? "—"}</b></small></td>
                           </tr>
                         ))}
                       </tbody>

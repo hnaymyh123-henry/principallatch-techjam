@@ -1740,7 +1740,7 @@ textarea:focus {
   background: #fae5e3;
 }
 
-.outcome-pending {
+.outcome-unconfirmed {
   color: #717b87;
   background: #e9edf0;
 }

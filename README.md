@@ -2,6 +2,10 @@
 
 **TikTok TechJam 2026 — Track 1: Bouncer**
 
+[![CI](https://github.com/hnaymyh123-henry/principallatch-techjam/actions/workflows/ci.yml/badge.svg)](https://github.com/hnaymyh123-henry/principallatch-techjam/actions/workflows/ci.yml)
+
+![PrincipalLatch trust boundary and judge proof sequence](output/pdf/PrincipalLatch_Architecture_One_Page.png)
+
 PrincipalLatch is authorization middleware for an Agent Runtime. It gives a real
 Codex Agent a short-lived session identity, then enforces the human's current,
 signed delegation at a trusted resource gateway. Identity alone never grants

@@ -97,7 +97,11 @@ For `GET /v1/documents/:resourceId`:
 6. **Persist before access.** A deny is atomically recorded with
    `ResourceOutcome=not_attempted`. An allow and `attempting` outcome are
    recorded before the provider call; terminal `succeeded` or `failed` follows.
-   An unavailable audit writer fails closed.
+   If the pre-access write fails, the provider is not called. If only the
+   terminal write fails after a provider attempt, the API preserves the
+   recorded `allow` and reports an `indeterminate` outcome instead of inventing
+   a deny; production recovery would require a transactional outbox and
+   provider receipt/idempotency protocol.
 7. **Return content only on allow.** The provider reads the generated mock
    canary only after the allow-side audit write succeeds.
 

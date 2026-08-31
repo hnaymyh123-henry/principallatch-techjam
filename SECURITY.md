@@ -69,7 +69,11 @@ Compromise of those components defeats the POC boundary.
 - Passport validation happens before resource lookup. A decision plus
   `ResourceOutcome=not_attempted` is persisted for a deny. An allow plus
   `ResourceOutcome=attempting` is persisted before provider access; terminal
-  success/failure is recorded separately. Audit-write failures fail closed.
+  success/failure is recorded separately. A pre-access audit failure fails
+  closed without calling the provider. A terminal audit failure cannot undo an
+  already attempted provider call, so the API reports the recorded
+  authorization as `allow` and its outcome as `indeterminate`; the durable
+  `attempting` event remains explicit rather than being rewritten as a deny.
 - Protected mock content is generated randomly per data directory and stored in
   a separate trusted file. It is not a source-code fixture and is not returned
   by catalog, security-summary, or audit APIs.
@@ -136,6 +140,23 @@ a compare-and-set transition that:
 - Use only generated mock documents. Never place personal, payroll, customer,
   or production content in this POC.
 - Stop the POC and revoke the Ark key after the event.
+
+### Post-competition data deletion
+
+The official rules require all data used or processed to be deleted when the
+competition is complete. After judging and any required verification period:
+
+1. stop `npm run poc` and confirm no containers carrying the
+   `io.codejam.principallatch=agent-runtime` label remain;
+2. revoke the scoped Ark key and remove any local shell/session copies of the
+   operator token;
+3. delete `.local/` or the configured `LOCAL_POC_DATA_ROOT`, including JSON
+   state, audit records, generated mock canaries, workspaces, and Codex home;
+4. delete non-submitted raw recordings, screenshots, console captures, and
+   provider/engine logs that contain Run data or mock content where retention
+   is under the entrant's control; and
+5. retain only the public source and final submission artifacts required for
+   judging, prize verification, and the licenses that apply to them.
 
 ## Report a vulnerability
 

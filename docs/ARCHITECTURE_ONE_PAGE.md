@@ -75,7 +75,8 @@ official cross-user deny case.
 4. Derive `document.read` from the route and owner/kind from the catalog.
 5. Persist deny + `not_attempted`, or allow + `attempting`, before provider
    access. Persist terminal `succeeded`/`failed` separately.
-6. Return protected content only on allow; audit failure fails closed.
+6. Return protected content only on allow; a pre-access audit failure fails
+   closed, while a missing terminal write reports an indeterminate outcome.
 
 ## Evidence state machine
 

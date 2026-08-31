@@ -127,9 +127,12 @@ two types of fact:
   Mandate ID/revision, and safe Passport commitment.
 - `ResourceOutcome`: `attempting`, `succeeded`, `failed`, or `not_attempted`.
 
-The decision and first outcome are written before provider access. Audit failure
-fails closed. The content file contains random per-deployment mock canaries and
-is not mounted into the Runtime.
+The decision and first outcome are written before provider access. A failure of
+that pre-access write fails closed. If only the terminal outcome write fails
+after a provider attempt, the API preserves the recorded `allow` and returns an
+`indeterminate` outcome rather than misreporting a denial. The content file
+contains random per-deployment mock canaries and is not mounted into the
+Runtime.
 
 ### Supported Runtime boundary
 
@@ -252,3 +255,9 @@ negative tests, and delivery materials. Full disclosure is in
       real-Agent path with a scoped Ark credential.
 - [ ] Do not claim public cloud unless a separately isolated deployment and
       fresh end-to-end smoke test are actually completed.
+
+### Post-competition
+
+- [ ] After judging and any required verification period, revoke the scoped Ark
+      key and follow the data-deletion procedure in
+      [`SECURITY.md`](../SECURITY.md#post-competition-data-deletion).

@@ -190,7 +190,7 @@ describe("PrincipalLatch protected resource boundary", () => {
     expect(test.principalLatch.contentProvider.readCount("alice-doc-001")).toBe(0);
   });
 
-  it("leaves an explicit attempting outcome when the terminal audit write fails", async () => {
+  it("reports an indeterminate outcome instead of a denial when terminal audit persistence fails", async () => {
     const test = await context();
     const agent = test.service.listAgents(ALICE_PRINCIPAL_ID)[0]!;
     const credential = test.principalLatch.credentialForAgent(agent);
@@ -222,7 +222,10 @@ describe("PrincipalLatch protected resource boundary", () => {
     expect(result).toMatchObject({
       ok: false,
       statusCode: 503,
-      code: "DENY_AUDIT_UNAVAILABLE",
+      decision: "allow",
+      outcome: "indeterminate",
+      providerAttempted: true,
+      code: "OUTCOME_AUDIT_UNAVAILABLE",
     });
     expect(test.principalLatch.contentProvider.readCount("alice-doc-001")).toBe(1);
     expect(recorded).toEqual(
@@ -241,5 +244,74 @@ describe("PrincipalLatch protected resource boundary", () => {
           event.status === "succeeded",
       ),
     ).toBe(false);
+  });
+
+  it("keeps an authorized provider failure indeterminate when its terminal audit cannot persist", async () => {
+    const test = await context();
+    const agent = test.service.listAgents(ALICE_PRINCIPAL_ID)[0]!;
+    const credential = test.principalLatch.credentialForAgent(agent);
+    const recorded: GatewayAuditEvent[] = [];
+    let batches = 0;
+    const interruptedAudit: AuditWriter = {
+      append: async (event) => {
+        recorded.push(event);
+      },
+      appendBatch: async (events) => {
+        batches += 1;
+        if (batches === 2) throw new Error("terminal audit unavailable");
+        recorded.push(...events);
+      },
+    };
+    test.principalLatch.contentProvider.setForcedFailure("alice-doc-001", true);
+    const gateway = new PrincipalLatchGateway(
+      test.principalLatch.passportBroker,
+      test.principalLatch.authority,
+      test.principalLatch.catalog,
+      test.principalLatch.contentProvider,
+      interruptedAudit,
+    );
+
+    const result = await gateway.readDocument(
+      "AgentPassport " + credential.passport,
+      "alice-doc-001",
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      statusCode: 503,
+      decision: "allow",
+      outcome: "indeterminate",
+      providerAttempted: true,
+      code: "OUTCOME_AUDIT_UNAVAILABLE",
+    });
+    expect(test.principalLatch.contentProvider.readCount("alice-doc-001")).toBe(1);
+    expect(
+      recorded.some(
+        (event) =>
+          event.eventType === "resource_outcome" && event.status === "failed",
+      ),
+    ).toBe(false);
+  });
+
+  it("reports a provider failure without rewriting the recorded allow as a denial", async () => {
+    const test = await context();
+    const agent = test.service.listAgents(ALICE_PRINCIPAL_ID)[0]!;
+    const credential = test.principalLatch.credentialForAgent(agent);
+    test.principalLatch.contentProvider.setForcedFailure("alice-doc-001", true);
+
+    const result = await test.principalLatch.readDocument(
+      "AgentPassport " + credential.passport,
+      "alice-doc-001",
+    );
+
+    expect(result).toMatchObject({
+      ok: false,
+      statusCode: 502,
+      decision: "allow",
+      outcome: "failed",
+      providerAttempted: true,
+      code: "RESOURCE_PROVIDER_FAILED",
+    });
+    expect(test.principalLatch.contentProvider.readCount("alice-doc-001")).toBe(1);
   });
 });

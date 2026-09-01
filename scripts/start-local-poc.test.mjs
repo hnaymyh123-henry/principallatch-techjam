@@ -11,8 +11,8 @@ const scriptsDirectory = path.dirname(fileURLToPath(import.meta.url));
 function baseEnvironment(stateRoot) {
   return {
     ...process.env,
-    ARK_API_KEY: "test-key",
-    ARK_MODEL: "test-model",
+    MODEL_API_KEY: "test-key",
+    MODEL_ID: "test-model",
     APP_AUTH_TOKEN: "0123456789abcdefghijklmn",
     LOCAL_POC_DATA_ROOT: stateRoot,
   };
@@ -45,14 +45,14 @@ test("cross-platform POC launcher fails closed before creating state when its en
   }
 });
 
-test("cross-platform POC launcher rejects reuse of the Agent-readable Ark key", () => {
+test("cross-platform POC launcher rejects reuse of the Agent-readable model key", () => {
   const temporaryRoot = mkdtempSync(path.join(tmpdir(), "principallatch-poc-secret-separation-"));
   const stateRoot = path.join(temporaryRoot, "must-not-exist");
   try {
     const repeatedSecret = "0123456789abcdefghijklmn";
     const result = invokeLauncher({
       ...baseEnvironment(stateRoot),
-      ARK_API_KEY: repeatedSecret,
+      MODEL_API_KEY: repeatedSecret,
       APP_AUTH_TOKEN: repeatedSecret,
       CONTAINER_ENGINE: "principallatch-engine-that-does-not-exist",
     });

@@ -52,7 +52,7 @@ disposable Runtime boundary, and judge-facing verification workflow.
 ## Standard components we do not claim as inventions
 
 PrincipalLatch does not claim ownership of the organizer scaffold, Codex CLI,
-Volcengine Ark, Ed25519, SHA-256, compact JWS, React, Fastify, Zod, Vitest,
+TokenDance, DeepSeek, Ed25519, SHA-256, compact JWS, React, Fastify, Zod, Vitest,
 Docker, or Podman. The original contribution is the concrete runtime-security
 integration and proof workflow, not the underlying cryptographic algorithms or
 frameworks.

@@ -119,20 +119,20 @@ trap finish EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
-if [[ -z "${ARK_API_KEY:-}" || -z "${ARK_MODEL:-}" || -z "${APP_AUTH_TOKEN:-}" ]]; then
-  log "ARK_API_KEY, ARK_MODEL, and APP_AUTH_TOKEN are required."
+if [[ -z "${MODEL_API_KEY:-}" || -z "${MODEL_ID:-}" || -z "${APP_AUTH_TOKEN:-}" ]]; then
+  log "MODEL_API_KEY, MODEL_ID, and APP_AUTH_TOKEN are required."
   log "APP_AUTH_TOKEN must contain 24-128 URL-safe characters."
-  log "Example: ARK_API_KEY=key ARK_MODEL=ep-id APP_AUTH_TOKEN=24-plus-random-characters npm run poc"
+  log "Example: MODEL_API_KEY=key MODEL_ID=deepseek-v4-flash-0731 APP_AUTH_TOKEN=24-plus-random-characters npm run poc"
   exit 2
 fi
 
-if [[ "$ARK_API_KEY" == replace-* || "$ARK_MODEL" == *replace-* ]]; then
-  log "ARK_API_KEY and ARK_MODEL must not be placeholder values."
+if [[ "$MODEL_API_KEY" == replace-* || "$MODEL_ID" == *replace-* ]]; then
+  log "MODEL_API_KEY and MODEL_ID must not be placeholder values."
   exit 2
 fi
 
-if [[ "$APP_AUTH_TOKEN" == "$ARK_API_KEY" ]]; then
-  log "APP_AUTH_TOKEN and ARK_API_KEY must be independently generated secrets."
+if [[ "$APP_AUTH_TOKEN" == "$MODEL_API_KEY" ]]; then
+  log "APP_AUTH_TOKEN and MODEL_API_KEY must be independently generated secrets."
   exit 2
 fi
 

@@ -9,20 +9,20 @@ Docker/Podman container.
 - Node.js 22+ and npm;
 - a running Docker or Podman engine (Docker Desktop/Colima are valid Docker
   providers);
-- a scoped Volcengine Ark API key;
-- a Responses-compatible Ark endpoint/model ID; and
+- a scoped TokenDance API key;
+- the Responses-compatible model ID `deepseek-v4-flash-0731`; and
 - an independently generated 24–128 character URL-safe operator token.
 
-`APP_AUTH_TOKEN` must not equal `ARK_API_KEY`: the Agent necessarily receives the
-Ark key, while only the Human operator may know the outer API token.
+`APP_AUTH_TOKEN` must not equal `MODEL_API_KEY`: the Agent necessarily receives the
+model key, while only the Human operator may know the outer API token.
 
 ## Start
 
 PowerShell on Windows:
 
 ```powershell
-$env:ARK_API_KEY = "your-scoped-competition-key"
-$env:ARK_MODEL = "ep-your-endpoint-id"
+$env:MODEL_API_KEY = "your-scoped-competition-key"
+$env:MODEL_ID = "deepseek-v4-flash-0731"
 $env:APP_AUTH_TOKEN = "use-24-plus-random-url-safe-characters"
 npm run poc
 ```
@@ -30,8 +30,8 @@ npm run poc
 Bash on macOS, Linux, or WSL:
 
 ```bash
-export ARK_API_KEY=your-scoped-competition-key
-export ARK_MODEL=ep-your-endpoint-id
+export MODEL_API_KEY=your-scoped-competition-key
+export MODEL_ID=deepseek-v4-flash-0731
 export APP_AUTH_TOKEN=use-24-plus-random-url-safe-characters
 npm run poc
 ```
@@ -47,7 +47,7 @@ Open <http://localhost:3000>, enter the operator token, continue as Alice, and c
 
 Before serving the UI, it:
 
-1. validates Node, Ark configuration, and the independent operator token;
+1. validates Node, model-provider configuration, and the independent operator token;
 2. selects Docker/Podman, or validates `CONTAINER_ENGINE` when explicitly set;
 3. removes and re-lists stale Runtime containers for this repository instance;
 4. blocks startup if credential-bearing stale state cannot be proven absent;
@@ -81,7 +81,7 @@ content, the repository, and the engine socket are not mounted.
 
 The container uses a read-only root, a bounded `noexec` temporary filesystem,
 no IPC, dropped capabilities, `no-new-privileges`, CPU/memory/PID limits, and
-`--log-driver none`. It still has outbound bridge networking for Ark and the
+`--log-driver none`. It still has outbound bridge networking for TokenDance and the
 Gateway.
 
 ## Options and troubleshooting

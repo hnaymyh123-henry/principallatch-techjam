@@ -57,7 +57,7 @@ reason, Mandate revision, safe Passport commitment, and provider outcome.
 ## How we built it
 
 PrincipalLatch extends the organizer's Agent Starter Kit while preserving its
-React/Fastify control plane and Codex CLI + Volcengine Ark Runtime path.
+React/Fastify control plane and Codex CLI + TokenDance Responses Runtime path.
 
 - **Agent identity:** compact Ed25519 JWS Passports bind the Human principal,
   Agent principal, Runtime session, Mandate ID, audience, issue time, expiry,
@@ -127,7 +127,8 @@ same boundary as reusable HTTP/MCP middleware for multiple Agent runtimes.
 
 - **Development tools:** TypeScript, Node.js 22, npm workspaces, Codex CLI,
   Docker/Podman, and GitHub Actions.
-- **APIs:** the Volcengine Ark OpenAI-compatible Responses API and
+- **APIs:** the TokenDance OpenAI-compatible Responses API (using
+  `deepseek-v4-flash-0731`) and
   PrincipalLatch's competition-authored Fastify HTTP Gateway.
 - **Assets:** the UI, favicon, architecture diagram, and generated mock
   document canaries were authored for this entry. No third-party media or
@@ -159,13 +160,13 @@ as the required live-Agent demonstration.
 
 ### Real Agent demonstration
 
-Install Node.js 22+ and Docker/Podman, then provide a scoped Volcengine Ark key,
+Install Node.js 22+ and Docker/Podman, then provide a scoped TokenDance API key,
 a Responses-compatible endpoint/model ID, and an independently generated
 operator token:
 
 ```bash
-ARK_API_KEY=... \
-ARK_MODEL=... \
+MODEL_API_KEY=... \
+MODEL_ID=deepseek-v4-flash-0731 \
 APP_AUTH_TOKEN=at-least-24-url-safe-characters \
 npm run poc
 ```

@@ -64,12 +64,18 @@ const envSchema = z.object({
     .max(10_000)
     .default(120),
   SESSION_COOKIE_SECURE: z.enum(["true", "false"]).default("false"),
-  ARK_API_KEY: z.string().optional(),
-  ARK_MODEL: z.string().optional(),
-  ARK_BASE_URL: z
+  MODEL_API_KEY: z.string().optional(),
+  MODEL_ID: z.string().default("deepseek-v4-flash-0731"),
+  MODEL_BASE_URL: z
     .string()
     .url()
-    .default("https://ark.cn-beijing.volces.com/api/v3"),
+    .default("https://tokendance.space/gateway/v1"),
+  MODEL_PROVIDER_ID: z
+    .string()
+    .regex(/^[A-Za-z0-9_-]+$/)
+    .default("tokendance"),
+  MODEL_PROVIDER_NAME: z.string().min(1).default("TokenDance"),
+  MODEL_APP_URL: z.string().url().default("app://principallatch-techjam"),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
 
@@ -83,7 +89,7 @@ export function containerEngineKind(command: string): string {
 export function loadConfig(environment: NodeJS.ProcessEnv = process.env) {
   const env = envSchema.parse(environment);
   const authToken = env.APP_AUTH_TOKEN?.trim() ?? "";
-  const arkApiKey = env.ARK_API_KEY?.trim() ?? "";
+  const modelApiKey = env.MODEL_API_KEY?.trim() ?? "";
   const loopbackHosts = new Set(["127.0.0.1", "::1", "localhost"]);
   if (env.RUNTIME_PROVIDER === "container" || !loopbackHosts.has(env.HOST)) {
     if (authToken.length < 24 || authToken.startsWith("replace-")) {
@@ -92,9 +98,9 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env) {
       );
     }
   }
-  if (authToken && arkApiKey && secretsEqual(authToken, arkApiKey)) {
+  if (authToken && modelApiKey && secretsEqual(authToken, modelApiKey)) {
     throw new Error(
-      "APP_AUTH_TOKEN and ARK_API_KEY must be independent secrets; the Agent receives the Ark key",
+      "APP_AUTH_TOKEN and MODEL_API_KEY must be independent secrets; the Agent receives the model key",
     );
   }
   const insecureLocalProcessAllowed =
@@ -186,19 +192,22 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env) {
     principalLatchPassportTtlSeconds: env.PRINCIPALLATCH_PASSPORT_TTL_SECONDS,
     principalLatchGatewayRateLimitMax: env.PRINCIPALLATCH_GATEWAY_RATE_LIMIT_MAX,
     sessionCookieSecure: env.SESSION_COOKIE_SECURE === "true",
-    arkApiKey,
-    arkModel: env.ARK_MODEL?.trim() ?? "",
-    arkBaseUrl: env.ARK_BASE_URL.replace(/\/+$/, ""),
+    modelApiKey,
+    modelId: env.MODEL_ID.trim(),
+    modelBaseUrl: env.MODEL_BASE_URL.replace(/\/+$/, ""),
+    modelProviderId: env.MODEL_PROVIDER_ID,
+    modelProviderName: env.MODEL_PROVIDER_NAME.trim(),
+    modelAppUrl: env.MODEL_APP_URL,
     nodeEnv: env.NODE_ENV,
   };
 }
 
-export function isArkConfigured(config: AppConfig): boolean {
+export function isModelConfigured(config: AppConfig): boolean {
   return (
-    config.arkApiKey.length > 0 &&
-    !config.arkApiKey.startsWith("replace-") &&
-    config.arkModel.length > 0 &&
-    !config.arkModel.includes("replace-")
+    config.modelApiKey.length > 0 &&
+    !config.modelApiKey.startsWith("replace-") &&
+    config.modelId.length > 0 &&
+    !config.modelId.includes("replace-")
   );
 }
 
@@ -233,17 +242,67 @@ export async function writeAgentCodexConfig(
     "Agent Codex home",
   );
   await chmod(codexHome, 0o700);
+  const modelCatalog = {
+    models: [
+      {
+        additional_speed_tiers: [],
+        availability_nux: null,
+        base_instructions:
+          "You are Codex, a coding agent. You and the user share the same workspace and collaborate to achieve the user's goals.",
+        context_window: 1_048_576,
+        default_reasoning_level: "high",
+        default_reasoning_summary: "none",
+        description: "DeepSeek-V4-Flash-0731",
+        display_name: "DeepSeek-V4-Flash-0731",
+        effective_context_window_percent: 95,
+        experimental_supported_tools: [],
+        input_modalities: ["text"],
+        minimal_client_version: "0.144.0",
+        max_context_window: 1_048_576,
+        priority: 1000,
+        service_tiers: [],
+        shell_type: "shell_command",
+        slug: "deepseek-v4-flash-0731",
+        support_verbosity: false,
+        supported_in_api: true,
+        supported_reasoning_levels: [
+          { description: "Disable Thinking", effort: "none" },
+          { description: "Enabled Thinking", effort: "high" },
+        ],
+        supports_image_detail_original: false,
+        supports_parallel_tool_calls: false,
+        supports_reasoning_summaries: true,
+        supports_search_tool: false,
+        truncation_policy: { limit: 10_000, mode: "bytes" },
+        upgrade: null,
+        visibility: "list",
+      },
+    ],
+  };
+  await replaceManagedFile(
+    codexHome,
+    "models.json",
+    JSON.stringify(modelCatalog, null, 2) + "\n",
+  );
+  const modelCatalogPath =
+    config.runtimeProvider === "container"
+      ? "/codex-home/models.json"
+      : path.join(codexHome, "models.json");
+  const providerSection = `model_providers.${config.modelProviderId}`;
   const toml = [
     "# Generated by PrincipalLatch. Edit environment variables, not this file.",
-    "model = " + JSON.stringify(config.arkModel || "ep-not-configured"),
-    'model_provider = "volcengine_ark"',
+    "model = " + JSON.stringify(config.modelId),
+    "model_provider = " + JSON.stringify(config.modelProviderId),
+    'model_reasoning_effort = "high"',
+    "model_catalog_json = " + JSON.stringify(modelCatalogPath),
     "",
-    "[model_providers.volcengine_ark]",
-    'name = "Volcengine Ark"',
-    "base_url = " + JSON.stringify(config.arkBaseUrl),
-    'env_key = "ARK_API_KEY"',
+    `[${providerSection}]`,
+    "name = " + JSON.stringify(config.modelProviderName),
+    "base_url = " + JSON.stringify(config.modelBaseUrl),
+    'env_key = "MODEL_API_KEY"',
     'wire_api = "responses"',
     "requires_openai_auth = false",
+    'http_headers = { "X-App-URL" = ' + JSON.stringify(config.modelAppUrl) + " }",
     "",
   ].join("\n");
   await replaceManagedFile(codexHome, "config.toml", toml);

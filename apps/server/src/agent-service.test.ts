@@ -29,7 +29,7 @@ describe("Agent lifecycle", () => {
   it("reports live Agent readiness only when the isolated Runtime is usable", async () => {
     const ready = await makeService();
     await expect(ready.systemInfo()).resolves.toMatchObject({
-      arkConfigured: true,
+      modelConfigured: true,
       codexAvailable: true,
       securityDemoEligible: true,
       liveAgentReady: true,
@@ -42,7 +42,7 @@ describe("Agent lifecycle", () => {
       shutdown: async () => undefined,
     });
     await expect(unavailable.systemInfo()).resolves.toMatchObject({
-      arkConfigured: true,
+      modelConfigured: true,
       codexAvailable: false,
       securityDemoEligible: true,
       liveAgentReady: false,
@@ -53,7 +53,7 @@ describe("Agent lifecycle", () => {
     const root = await mkdtemp(path.join(tmpdir(), "principallatch-unconfigured-run-test-"));
     temporaryDirectories.push(root);
     const test = await createTestContext(root, {
-      environment: { ARK_API_KEY: "", ARK_MODEL: "" },
+      environment: { MODEL_API_KEY: "", MODEL_ID: "" },
     });
     const agent = test.service.listAgents(ALICE_PRINCIPAL_ID)[0]!;
 
@@ -168,7 +168,7 @@ describe("Agent lifecycle", () => {
     const service = await makeService({
       run: async (request) => ({
         output:
-          "passport=" + request.principalLatch.passport + " ark=test-key",
+          "passport=" + request.principalLatch.passport + " model=test-key",
         threadId: "secret-test-thread",
         usage: null,
       }),
@@ -188,7 +188,7 @@ describe("Agent lifecycle", () => {
       .toBe("completed");
     const stored = service.getRun(ALICE_PRINCIPAL_ID, run.id);
     expect(stored.output).toBe(
-      "passport=[REDACTED_AGENT_PASSPORT] ark=[REDACTED_ARK_API_KEY]",
+      "passport=[REDACTED_AGENT_PASSPORT] model=[REDACTED_MODEL_API_KEY]",
     );
     expect(JSON.stringify(service.getMessages(ALICE_PRINCIPAL_ID, agent.id))).not.toContain(
       "test-key",
@@ -218,7 +218,7 @@ describe("Agent lifecycle", () => {
       .toBe("failed");
     const stored = service.getRun(ALICE_PRINCIPAL_ID, run.id);
     expect(stored.error).toContain("[REDACTED_AGENT_PASSPORT]");
-    expect(stored.error).toContain("[REDACTED_ARK_API_KEY]");
+    expect(stored.error).toContain("[REDACTED_MODEL_API_KEY]");
     expect(stored.error).not.toContain("test-key");
   });
 

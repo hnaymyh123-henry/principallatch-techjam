@@ -112,14 +112,14 @@ function Remove-RuntimeContainers {
 }
 
 try {
-  if (-not $env:ARK_API_KEY -or -not $env:ARK_MODEL -or -not $env:APP_AUTH_TOKEN) {
-    throw "ARK_API_KEY, ARK_MODEL, and APP_AUTH_TOKEN are required. APP_AUTH_TOKEN must contain 24-128 URL-safe characters."
+  if (-not $env:MODEL_API_KEY -or -not $env:MODEL_ID -or -not $env:APP_AUTH_TOKEN) {
+    throw "MODEL_API_KEY, MODEL_ID, and APP_AUTH_TOKEN are required. APP_AUTH_TOKEN must contain 24-128 URL-safe characters."
   }
-  if ($env:ARK_API_KEY.StartsWith("replace-") -or $env:ARK_MODEL.Contains("replace-")) {
-    throw "ARK_API_KEY and ARK_MODEL must not be placeholder values."
+  if ($env:MODEL_API_KEY.StartsWith("replace-") -or $env:MODEL_ID.Contains("replace-")) {
+    throw "MODEL_API_KEY and MODEL_ID must not be placeholder values."
   }
-  if ($env:APP_AUTH_TOKEN -ceq $env:ARK_API_KEY) {
-    throw "APP_AUTH_TOKEN and ARK_API_KEY must be independently generated secrets."
+  if ($env:APP_AUTH_TOKEN -ceq $env:MODEL_API_KEY) {
+    throw "APP_AUTH_TOKEN and MODEL_API_KEY must be independently generated secrets."
   }
   if (
     $env:APP_AUTH_TOKEN.Length -lt 24 -or

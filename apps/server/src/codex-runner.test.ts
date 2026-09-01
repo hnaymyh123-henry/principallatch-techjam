@@ -95,12 +95,12 @@ describe("Codex runner protocol", () => {
 
   it("redacts every secret injected into the Agent Runtime", () => {
     const passport = "passport.header.payload.signature";
-    const arkApiKey = "ark-secret-123";
+    const modelApiKey = "model-secret-123";
     const value =
-      "passport=" + passport + " key=" + arkApiKey + " again=" + arkApiKey;
+      "passport=" + passport + " key=" + modelApiKey + " again=" + modelApiKey;
 
-    expect(redactRuntimeSecrets(value, passport, arkApiKey)).toBe(
-      "passport=[REDACTED_AGENT_PASSPORT] key=[REDACTED_ARK_API_KEY] again=[REDACTED_ARK_API_KEY]",
+    expect(redactRuntimeSecrets(value, passport, modelApiKey)).toBe(
+      "passport=[REDACTED_AGENT_PASSPORT] key=[REDACTED_MODEL_API_KEY] again=[REDACTED_MODEL_API_KEY]",
     );
   });
 
@@ -119,8 +119,8 @@ describe("Codex runner protocol", () => {
           AGENT_WORKSPACE_ROOT: path.join(root, "workspaces"),
           CODEX_HOME: path.join(root, "codex-home"),
           CODEX_BIN: path.join(root, "must-not-spawn"),
-          ARK_API_KEY: "test-key",
-          ARK_MODEL: "ep-test",
+          MODEL_API_KEY: "test-key",
+          MODEL_ID: "test-model",
         }),
       );
       const pending = runner.run({

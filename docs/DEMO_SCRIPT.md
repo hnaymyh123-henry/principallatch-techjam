@@ -1,7 +1,7 @@
 # PrincipalLatch — three-minute live demo
 
 This is the operator cue card for **TikTok TechJam 2026 — Track 1: Bouncer**.
-The primary proof uses real Codex CLI turns connected to Volcengine Ark. A test,
+The primary proof uses real Codex CLI turns connected to TokenDance's Responses API. A test,
 HTTP verifier, or recorded artifact must never be described as a live Agent Run.
 
 ## One-sentence story
@@ -19,7 +19,7 @@ Agent. Both identities are mock fixtures, not production authentication.
 
 The camera must show:
 
-1. a real containerized Codex/Ark Run;
+1. a real containerized Codex/TokenDance Run;
 2. `alice-doc-001 → ALLOW_SCOPE_RULE → succeeded`;
 3. `bob-payroll-001 → DENY_OWNER_MISMATCH → not_attempted`, with Bob's audited
    successful reads still `0`;
@@ -35,7 +35,7 @@ additional revocable-delegation proof.
 ## Before the judging timer
 
 - [ ] Use the final clean commit and the supported `npm run poc` profile.
-- [ ] Confirm the sidebar says a container Runtime and shows the configured Ark
+- [ ] Confirm the sidebar says a container Runtime and shows the configured TokenDance
       model/engine. There must be no red **Insecure Runtime preview** banner.
 - [ ] Run `npm run check` and save its fresh output.
 - [ ] Run `npm run verify:demo` and retain its output, while remembering that it
@@ -46,9 +46,9 @@ additional revocable-delegation proof.
       successor Mandate and proof phase `ready turn 1`.
 - [ ] Confirm no Run is active and the **Fill Turn 1** button is enabled. The
       Passport will be issued when Turn 1 starts, so do not wait for it first.
-- [ ] Close terminals or panels that could expose `ARK_API_KEY`, app token,
+- [ ] Close terminals or panels that could expose `MODEL_API_KEY`, app token,
       signing files, the raw Passport, or generated document content.
-- [ ] Rehearse against the actual Ark endpoint. The two Runs and narration must
+- [ ] Rehearse against the actual TokenDance endpoint. The two Runs and narration must
       complete before the 300-second Passport lifetime and three-minute limit.
 
 Fresh rehearsal does not erase history or reactivate a revoked Mandate. It
@@ -71,7 +71,7 @@ visible proof to the successor.
 | **2:40–2:55** | Show `DENY_MANDATE_LIFECYCLE / not attempted`; compare both Run rows' Passport SHA-256 and `jti`. | “Identity is still valid; authority is gone. Revocation takes effect before another content read.” |
 | **2:55–3:00** | End on proof phase `complete` and the audit table. | “PrincipalLatch makes a general Agent Runtime a verifiable, revocable delegated actor.” |
 
-If actual Ark latency differs, move explanation into the wait periods; never
+If actual TokenDance latency differs, move explanation into the wait periods; never
 skip either real Run or speak past three minutes.
 
 ## Exact prompts
@@ -102,7 +102,7 @@ Do not paste a Passport or secret into either prompt.
 
 ## Honest failure path
 
-If Docker/Podman, Codex, or Ark fails during judging:
+If Docker/Podman, Codex, or TokenDance fails during judging:
 
 1. keep the failed Run ID, time, and exact error visible; do not claim success;
 2. run `npm run verify:demo` and show the fresh Alice/Bob/revocation middleware

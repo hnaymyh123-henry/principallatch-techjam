@@ -268,14 +268,14 @@ export class CodexRunner implements AgentRunner {
         const detail = redactRuntimeSecrets(
           parsed.errors.at(-1) ?? stderr.trim() ?? "No error detail",
           request.principalLatch.passport,
-          this.config.arkApiKey,
+          this.config.modelApiKey,
         );
         throw new Error("Codex exited with code " + exitCode + ": " + detail);
       }
       const output = redactRuntimeSecrets(
         parsed.messages.at(-1)?.trim() ?? "",
         request.principalLatch.passport,
-        this.config.arkApiKey,
+        this.config.modelApiKey,
       );
       if (!output) {
         throw new Error("Codex completed without an agent message");
@@ -333,7 +333,7 @@ export class CodexRunner implements AgentRunner {
     return {
       ...this.helperEnvironment(),
       CODEX_HOME: agentCodexHomePath(this.config, request.agentId),
-      ARK_API_KEY: this.config.arkApiKey,
+      MODEL_API_KEY: this.config.modelApiKey,
       PRINCIPALLATCH_AGENT_PASSPORT: request.principalLatch.passport,
       PRINCIPALLATCH_GATEWAY_URL: request.principalLatch.gatewayUrl,
     };
@@ -343,12 +343,12 @@ export class CodexRunner implements AgentRunner {
 export function redactRuntimeSecrets(
   value: string,
   passport: string,
-  arkApiKey: string,
+  modelApiKey: string,
 ): string {
   let redacted = value;
   for (const [secret, replacement] of [
     [passport, "[REDACTED_AGENT_PASSPORT]"],
-    [arkApiKey, "[REDACTED_ARK_API_KEY]"],
+    [modelApiKey, "[REDACTED_MODEL_API_KEY]"],
   ] as const) {
     if (secret) redacted = redacted.split(secret).join(replacement);
   }

@@ -463,7 +463,7 @@ def build() -> Path:
         size=6.2,
         color=MUTED,
     )
-    label(canvas, "Runtime: real Codex CLI + Volcengine Ark in a disposable Docker/Podman container", 28, 29, size=6.2, color=TEXT, font="Helvetica-Bold")
+    label(canvas, "Runtime: real Codex CLI + TokenDance Responses in a disposable Docker/Podman container", 28, 29, size=6.2, color=TEXT, font="Helvetica-Bold")
     label(canvas, "Local judging path  |  npm run poc", 662, 29, size=6.2, color=TEAL, font="Helvetica-Bold")
 
     canvas.showPage()

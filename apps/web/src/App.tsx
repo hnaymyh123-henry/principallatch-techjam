@@ -510,7 +510,7 @@ export default function App() {
     if (!selected || !prompt.trim()) return;
     if (!liveAgentReady) {
       setError(
-        "Live Agent setup is incomplete. Configure Ark and the isolated container Runtime before launching a Run.",
+        "Live Agent setup is incomplete. Configure the model provider and isolated container Runtime before launching a Run.",
       );
       return;
     }
@@ -700,7 +700,9 @@ export default function App() {
           <div className="runtime-state"><span className="pulse" />Agent Runtime</div>
           <strong>{system?.runtime ?? "Checking…"}</strong>
           <span>
-            {system?.arkModel ?? "Ark model not configured"}
+            {system?.modelId
+              ? `${system.modelProvider} · ${system.modelId}`
+              : "Model provider not configured"}
             {system?.containerEngine ? " · " + system.containerEngine : ""}
           </span>
           <button onClick={() => void endSession()} disabled={busy}>End Human session</button>
@@ -722,14 +724,14 @@ export default function App() {
           </div>
         ) : null}
 
-        {!system?.arkConfigured || !system?.codexAvailable ? (
+        {!system?.modelConfigured || !system?.codexAvailable ? (
           <div className="config-banner">
             <span>!</span>
             <div>
               <strong>Agent Runtime configuration needed</strong>
               <p>
-                {!system?.arkConfigured
-                  ? "Set ARK_API_KEY and ARK_MODEL before running the live Agent. Security state remains inspectable."
+                {!system?.modelConfigured
+                  ? "Set MODEL_API_KEY and MODEL_ID before running the live Agent. Security state remains inspectable."
                   : system.runtimeProvider === "container"
                     ? "The container engine or Agent Runtime image is unavailable."
                     : "Codex CLI was not found in the runtime."}
@@ -929,7 +931,7 @@ export default function App() {
                       className="send-button"
                       disabled={!prompt.trim() || !liveAgentReady || selected.status === "stopped" || selected.status === "busy" || runInProgress}
                       aria-label="Run Agent"
-                      title={liveAgentReady ? "Launch the real Agent Runtime" : "Configure Ark and the isolated Runtime first"}
+                      title={liveAgentReady ? "Launch the real Agent Runtime" : "Configure the model provider and isolated Runtime first"}
                     >Run <b>↑</b></button>
                   </div>
                 </form>

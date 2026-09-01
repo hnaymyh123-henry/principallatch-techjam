@@ -41,12 +41,12 @@ flowchart LR
     S -->|"one container per turn"| X
     P -->|"Passport in Runtime environment"| X
     T -->|"/v1 + AgentPassport"| G
-    X -->|"Responses API"| V["Volcengine Ark"]
+    X -->|"Responses API"| V["TokenDance<br/>DeepSeek V4 Flash"]
 ```
 
 The trusted Fastify process runs on the host. Each real Agent turn runs in a
 separate disposable Docker/Podman container. The Runtime receives only its
-Agent workspace, per-Agent Codex home, Ark key, short-lived Passport, and
+Agent workspace, per-Agent Codex home, model key, short-lived Passport, and
 Gateway URL. It does not receive the control-plane repository, JSON store,
 signing-key directory, or protected-content file.
 
@@ -158,7 +158,7 @@ refuses to run while it is busy. It does not reactivate a revoked record:
 | `APP_DATA_DIR/principallatch-protected-content.json` | Per-deployment random Alice/Bob canaries | Trusted host only; never mounted to Runtime |
 | `AGENT_WORKSPACE_ROOT/<agent-id>/` | Agent files and protected-resource client | Only selected Agent path is mounted |
 | `CODEX_HOME/agents/<agent-id>/` | Generated provider config and Codex session state | Only selected Agent path is mounted; may retain authorized content |
-| Runtime environment | Scoped Ark key, Passport, Gateway URL | Ephemeral bearer secrets; observable to engine/host administrators |
+| Runtime environment | Scoped model key, Passport, Gateway URL | Ephemeral bearer secrets; observable to engine/host administrators |
 
 Application state persists only safe Passport commitments (`jti`, expiry, and
 SHA-256), not the compact JWS. Known secrets are redacted from captured child
@@ -170,7 +170,7 @@ workspace, or Codex state; the demo therefore uses generated mock canaries only.
 The container invocation uses a read-only root, constrained temporary storage,
 no IPC, dropped capabilities, `no-new-privileges`, CPU/memory/PID limits, and
 the minimum two Agent-specific bind mounts. It has outbound bridge networking
-for Ark and the Gateway.
+for TokenDance and the Gateway.
 
 These controls do not provide host compromise resistance, engine-admin
 isolation, egress filtering, workload attestation, sender-constrained tokens,

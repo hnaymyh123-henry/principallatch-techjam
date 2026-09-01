@@ -46,8 +46,8 @@ export async function createTestContext(
     CODEX_HOME: path.join(root, "codex"),
     PRINCIPALLATCH_KEY_DIR: path.join(root, "keys"),
     PRINCIPALLATCH_GATEWAY_URL: "http://127.0.0.1:3000",
-    ARK_API_KEY: "test-key",
-    ARK_MODEL: "ep-test",
+    MODEL_API_KEY: "test-key",
+    MODEL_ID: "test-model",
     APP_AUTH_TOKEN: options.authToken ?? TEST_APP_AUTH_TOKEN,
     ...options.environment,
   });

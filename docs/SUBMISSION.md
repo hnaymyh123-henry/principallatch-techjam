@@ -69,7 +69,7 @@ Source: organizer
 | Allow User A's mock resource | The Gateway records `ALLOW_SCOPE_RULE`; only then can `alice-doc-001` reach the provider. |
 | Deny User B's mock resource in the backend | The same Agent receives HTTP `403 DENY_OWNER_MISMATCH`; Bob's outcome is `not_attempted` and audited successful reads stay `0`. |
 | Record Human, Agent, action, resource, decision | Gateway audit rows contain all five fields plus reason, Mandate ID/revision, Passport commitment, and provider outcome. |
-| Demonstrate a real Agent Run | The primary judging path uses Codex CLI in a disposable Runtime container with Volcengine Ark. Final live evidence remains a submission gate. |
+| Demonstrate a real Agent Run | The primary judging path uses Codex CLI in a disposable Runtime container with TokenDance and `deepseek-v4-flash-0731`. Final live evidence remains a submission gate. |
 | Code repository and architecture/live-demo materials | Repository access/URL, final commit, one-page diagram, and ≤3-minute real-Agent demo remain final delivery gates. |
 
 Revocation, same-Passport lifecycle denial, current-evidence state, signed profile
@@ -138,7 +138,7 @@ Runtime.
 
 The trusted Fastify process runs on the host. Every real Codex turn runs in a
 disposable Docker/Podman container with only that Agent's workspace and Codex
-home mounted. The Runtime receives a scoped Ark key, Passport, and Gateway URL;
+home mounted. The Runtime receives a scoped model key, Passport, and Gateway URL;
 it does not receive control-plane state, signing keys, or the protected-content
 file.
 
@@ -158,7 +158,7 @@ The UI derives the proof phase only from current-successor evidence.
 
 | Layer | Technology |
 | --- | --- |
-| Real Agent Runtime | Codex CLI + Volcengine Ark |
+| Real Agent Runtime | Codex CLI + TokenDance Responses API |
 | Trusted control plane / Gateway | Node.js 22+, TypeScript, Fastify |
 | Demo UI | React 19, Vite |
 | Credentials / commitments | Compact JWS, Ed25519, SHA-256 |
@@ -169,7 +169,7 @@ The UI derives the proof phase only from current-successor evidence.
 ## Three-minute demo outline
 
 1. Show Alice, `agent:alice-researcher`, and the trusted boundary.
-2. Run the exact Turn 1 prompt with real Codex/Ark.
+2. Run the exact Turn 1 prompt with real Codex/TokenDance.
 3. Show Alice allow/success and Bob backend deny/not-attempted/zero successes.
 4. Revoke the current Mandate while Passport TTL remains positive.
 5. Run Turn 2 with the same Passport commitment/`jti`.
@@ -206,7 +206,7 @@ negative tests, and delivery materials. Full disclosure is in
   workspace, and per-Agent Codex state.
 - Container/host administrators can inspect Runtime state; application redaction
   is not proof about external logs or telemetry.
-- The Runtime has outbound access for Ark and the Gateway. Ordinary containers
+- The Runtime has outbound access for TokenDance and the Gateway. Ordinary containers
   are a hackathon boundary, not hostile multi-tenant isolation.
 - The deterministic `npm run verify:demo` path uses no model and cannot replace
   the official real Agent Run.
@@ -222,13 +222,13 @@ negative tests, and delivery materials. Full disclosure is in
       `middleware-verification-no-model` / `liveAgentRun=false`.
 - [ ] `npm audit --omit=dev` has no unresolved high/critical finding, or each
       remaining finding is accurately disclosed.
-- [ ] Review committed files and captured application output for Ark/app tokens,
+- [ ] Review committed files and captured application output for model/app tokens,
       signing seeds, raw Passports, and generated canaries.
 
 ### Official live proof
 
 - [ ] Start the security-supported profile with `npm run poc`.
-- [ ] A real Codex + Ark Turn 1 produces Alice allow/success and Bob backend
+- [ ] A real Codex + TokenDance Turn 1 produces Alice allow/success and Bob backend
       deny/not-attempted with zero Bob successes.
 - [ ] Revocation plus real Turn 2 produces a same-Passport lifecycle denial while
       TTL remains positive.
@@ -252,12 +252,12 @@ negative tests, and delivery materials. Full disclosure is in
       **pending**.
 - [ ] Verify the public repository provides a free test build/path for judges:
       `npm run verify:demo` without credentials and the documented `npm run poc`
-      real-Agent path with a scoped Ark credential.
+      real-Agent path with a scoped model credential.
 - [ ] Do not claim public cloud unless a separately isolated deployment and
       fresh end-to-end smoke test are actually completed.
 
 ### Post-competition
 
-- [ ] After judging and any required verification period, revoke the scoped Ark
+- [ ] After judging and any required verification period, revoke the scoped model
       key and follow the data-deletion procedure in
       [`SECURITY.md`](../SECURITY.md#post-competition-data-deletion).

@@ -16,7 +16,7 @@ The security-supported profile has two trust domains:
    and JSON audit/state storage.
 2. Each untrusted real Codex turn runs in a disposable Docker/Podman container.
    It receives only that Agent's workspace, that Agent's Codex home, the scoped
-   Ark key, the current short-lived Agent Passport, and the Gateway URL.
+   model API key, the current short-lived Agent Passport, and the Gateway URL.
 
 Run this profile with `npm run poc`. The Runtime receives no mount of the
 repository, control-plane data directory, signing-key directory, or
@@ -39,7 +39,7 @@ captured but still-valid Passport must stop working when its Agent session ends
 or its current Mandate is revoked.
 
 The trusted host account, Fastify process, local JSON store, container-engine
-administrator, and configured Ark service are outside this adversary model.
+administrator, and configured model provider are outside this adversary model.
 Compromise of those components defeats the POC boundary.
 
 ## Implemented controls
@@ -79,7 +79,7 @@ Compromise of those components defeats the POC boundary.
   by catalog, security-summary, or audit APIs.
 - Application code does not place raw Passports in prompts, argv, Human/browser
   API responses, persisted Run credential fields, or audit records. Known
-  Passport and Ark values are redacted from captured Runner output and errors.
+  Passport and model-key values are redacted from captured Runner output and errors.
 - Passport and Mandate seed files are created exclusively and request `0600`
   mode where the platform honors POSIX permissions.
 - Runtime containers use a read-only root, a constrained `/tmp`, no IPC,
@@ -108,7 +108,7 @@ a compare-and-set transition that:
 - A container-engine or host administrator can inspect process/container state.
   Application-level redaction does not prove that a raw Passport is absent from
   engine events, host telemetry, crash dumps, or third-party observability.
-- The Runtime has outbound bridge-network access for Ark and the Gateway. There
+- The Runtime has outbound bridge-network access for TokenDance and the Gateway. There
   is no egress allowlist, proxy policy, or network-level exfiltration defense.
 - Authorized Alice content is delivered to the Agent and may persist in model
   output, `principallatch.json`, the Agent workspace, or per-Agent Codex state. Only
@@ -132,14 +132,14 @@ a compare-and-set transition that:
 ## Safe operation
 
 - Use only `npm run poc` for the judged security demonstration.
-- Use a scoped, revocable competition Ark key and a unique 24+ character
+- Use a scoped, revocable competition model key and a unique 24+ character
   URL-safe `APP_AUTH_TOKEN`.
 - Keep the trusted data directory and container-engine API inaccessible to the
   Runtime. Inspect and remove residual labelled Runtime containers after a
   crash.
 - Use only generated mock documents. Never place personal, payroll, customer,
   or production content in this POC.
-- Stop the POC and revoke the Ark key after the event.
+- Stop the POC and revoke the model key after the event.
 
 ### Post-competition data deletion
 
@@ -148,7 +148,7 @@ competition is complete. After judging and any required verification period:
 
 1. stop `npm run poc` and confirm no containers carrying the
    `io.codejam.principallatch=agent-runtime` label remain;
-2. revoke the scoped Ark key and remove any local shell/session copies of the
+2. revoke the scoped model key and remove any local shell/session copies of the
    operator token;
 3. delete `.local/` or the configured `LOCAL_POC_DATA_ROOT`, including JSON
    state, audit records, generated mock canaries, workspaces, and Codex home;

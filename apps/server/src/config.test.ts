@@ -92,7 +92,7 @@ describe("PrincipalLatch Runtime trust boundary", () => {
     expect(config.allowedOrigins).not.toContain("https://attacker.example");
   });
 
-  it("rejects reusing the Agent-readable Ark key as the Human API token", () => {
+  it("rejects reusing the Agent-readable model key as the Human API token", () => {
     const repeated = "same-independent-secret-1234567890";
     expect(() =>
       loadConfig({
@@ -100,7 +100,7 @@ describe("PrincipalLatch Runtime trust boundary", () => {
         HOST: "0.0.0.0",
         RUNTIME_PROVIDER: "container",
         APP_AUTH_TOKEN: repeated,
-        ARK_API_KEY: repeated,
+        MODEL_API_KEY: repeated,
       }),
     ).toThrow(/must be independent secrets/);
   });
@@ -122,7 +122,7 @@ describe("PrincipalLatch Runtime trust boundary", () => {
       NODE_ENV: "development",
       APP_AUTH_TOKEN: validAuthToken,
       CODEX_HOME: path.join(root, "codex-home"),
-      ARK_MODEL: "test-model",
+      MODEL_ID: "test-model",
     });
     await writeAgentCodexConfig(config, "agent-one");
 
@@ -140,5 +140,21 @@ describe("PrincipalLatch Runtime trust boundary", () => {
 
     expect(await readFile(sentinel, "utf8")).toBe("outside must remain unchanged");
     expect(await readFile(target, "utf8")).toContain('model = "test-model"');
+    expect(await readFile(target, "utf8")).toContain(
+      'base_url = "https://tokendance.space/gateway/v1"',
+    );
+    expect(await readFile(target, "utf8")).toContain('env_key = "MODEL_API_KEY"');
+    expect(await readFile(target, "utf8")).toContain('wire_api = "responses"');
+    expect(await readFile(target, "utf8")).toContain(
+      'http_headers = { "X-App-URL" = "app://principallatch-techjam" }',
+    );
+    expect(
+      JSON.parse(
+        await readFile(
+          path.join(agentCodexHomePath(config, "agent-one"), "models.json"),
+          "utf8",
+        ),
+      ).models[0].slug,
+    ).toBe("deepseek-v4-flash-0731");
   });
 });

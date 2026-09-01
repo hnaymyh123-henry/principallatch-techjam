@@ -102,7 +102,7 @@ export function buildContainerRunArgs(
     "--user",
     config.containerUser,
     "--env",
-    "ARK_API_KEY",
+    "MODEL_API_KEY",
     "--env",
     "PRINCIPALLATCH_AGENT_PASSPORT",
     "--env",
@@ -337,7 +337,7 @@ export class ContainerCodexRunner implements AgentRunner {
         const detail = redactRuntimeSecrets(
           parsed.errors.at(-1) ?? stderr.trim() ?? "No error detail",
           request.principalLatch.passport,
-          this.config.arkApiKey,
+          this.config.modelApiKey,
         );
         throw new Error(
           this.config.containerEngine +
@@ -350,7 +350,7 @@ export class ContainerCodexRunner implements AgentRunner {
       const output = redactRuntimeSecrets(
         parsed.messages.at(-1)?.trim() ?? "",
         request.principalLatch.passport,
-        this.config.arkApiKey,
+        this.config.modelApiKey,
       );
       if (!output) throw new Error("Codex completed without an agent message");
       return { output, threadId: parsed.threadId, usage: parsed.usage };
@@ -375,7 +375,7 @@ export class ContainerCodexRunner implements AgentRunner {
   private runChildEnvironment(request: RunnerRequest): NodeJS.ProcessEnv {
     return {
       ...this.helperEnvironment(),
-      ARK_API_KEY: this.config.arkApiKey,
+      MODEL_API_KEY: this.config.modelApiKey,
       PRINCIPALLATCH_AGENT_PASSPORT: request.principalLatch.passport,
       PRINCIPALLATCH_GATEWAY_URL: request.principalLatch.gatewayUrl,
     };

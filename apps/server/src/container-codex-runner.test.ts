@@ -26,8 +26,8 @@ describe("Container Codex runner", () => {
     const config = loadConfig({
       NODE_ENV: "test",
       APP_AUTH_TOKEN: appAuthToken,
-      ARK_API_KEY: "secret-that-must-not-appear-in-argv",
-      ARK_MODEL: "ep-test",
+      MODEL_API_KEY: "secret-that-must-not-appear-in-argv",
+      MODEL_ID: "test-model",
       CODEX_HOME: "/tmp/codex-home",
       RUNTIME_PROVIDER: "container",
       CONTAINER_ENGINE: "podman",
@@ -181,7 +181,7 @@ describe("Container Codex runner", () => {
       CONTAINERS_STORAGE_CONF: "C:\\Podman\\storage.conf",
       XDG_CONFIG_HOME: "C:\\Users\\judge\\.config",
       APPDATA: "C:\\Users\\judge\\AppData\\Roaming",
-      ARK_API_KEY: "must-not-be-in-helper-env",
+      MODEL_API_KEY: "must-not-be-in-helper-env",
       APP_AUTH_TOKEN: "must-not-be-in-helper-env",
     });
 
@@ -204,7 +204,7 @@ describe("Container Codex runner", () => {
       APPDATA: "C:\\Users\\judge\\AppData\\Roaming",
       NO_COLOR: "1",
     });
-    expect(environment.ARK_API_KEY).toBeUndefined();
+    expect(environment.MODEL_API_KEY).toBeUndefined();
     expect(environment.APP_AUTH_TOKEN).toBeUndefined();
   });
 
@@ -273,8 +273,8 @@ describe("Container Codex runner", () => {
           PRINCIPALLATCH_PROTECTED_CONTENT_FILE: protectedContent,
           CONTAINER_ENGINE: path.join(root, "must-not-spawn"),
           CONTAINER_RUNTIME_IMAGE: "runtime:test",
-          ARK_API_KEY: "test-key",
-          ARK_MODEL: "ep-test",
+          MODEL_API_KEY: "test-key",
+          MODEL_ID: "test-model",
         }),
       );
       const pending = runner.run({

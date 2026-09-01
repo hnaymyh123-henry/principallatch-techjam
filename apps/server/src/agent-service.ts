@@ -11,7 +11,7 @@ import {
   DEMO_MANDATE_ID,
 } from "./principallatch/fixtures.js";
 import type { AppConfig } from "./config.js";
-import { isArkConfigured } from "./config.js";
+import { isModelConfigured } from "./config.js";
 import { redactRuntimeSecrets } from "./codex-runner.js";
 import { HttpError, RunCancelledError } from "./errors.js";
 import { JsonStore } from "./store.js";
@@ -287,10 +287,10 @@ export class AgentService {
     if (this.stopping) {
       throw new HttpError(503, "Server is shutting down");
     }
-    if (!isArkConfigured(this.config)) {
+    if (!isModelConfigured(this.config)) {
       throw new HttpError(
         503,
-        "Ark is not configured. Set ARK_API_KEY and ARK_MODEL, then restart.",
+        "The model provider is not configured. Set MODEL_API_KEY and MODEL_ID, then restart.",
       );
     }
     if (!(await this.runner.isAvailable())) {
@@ -381,13 +381,14 @@ export class AgentService {
   }
 
   async systemInfo(): Promise<Record<string, unknown>> {
-    const arkConfigured = isArkConfigured(this.config);
+    const modelConfigured = isModelConfigured(this.config);
     const codexAvailable = await this.runner.isAvailable();
     const securityDemoEligible = this.config.runtimeProvider === "container";
     return {
-      arkConfigured,
-      arkBaseUrl: this.config.arkBaseUrl,
-      arkModel: this.config.arkModel || null,
+      modelConfigured,
+      modelProvider: this.config.modelProviderName,
+      modelBaseUrl: this.config.modelBaseUrl,
+      modelId: this.config.modelId || null,
       codexAvailable,
       codexSandboxMode: this.config.codexSandboxMode,
       runtimeProvider: this.config.runtimeProvider,
@@ -397,7 +398,7 @@ export class AgentService {
           : "insecure-same-os-user",
       securityDemoEligible,
       liveAgentReady:
-        securityDemoEligible && arkConfigured && codexAvailable,
+        securityDemoEligible && modelConfigured && codexAvailable,
       principalLatchGatewayUrl: this.config.principalLatchGatewayUrl,
       containerEngine:
         this.config.runtimeProvider === "container"
@@ -471,7 +472,7 @@ export class AgentService {
       const safeOutput = redactRuntimeSecrets(
         result.output,
         principalLatch.passport,
-        this.config.arkApiKey,
+        this.config.modelApiKey,
       );
       const completedAt = now();
       await this.store.mutate((database) => {
@@ -502,7 +503,7 @@ export class AgentService {
       const message = redactRuntimeSecrets(
         error instanceof Error ? error.message : String(error),
         principalLatch.passport,
-        this.config.arkApiKey,
+        this.config.modelApiKey,
       );
       await this.store.mutate((database) => {
         const storedRun = database.runs.find((item) => item.id === run.id);

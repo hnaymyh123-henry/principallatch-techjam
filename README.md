@@ -36,7 +36,7 @@ The source of truth is the organizer's
 | Allow User A's mock resource | `alice-doc-001` reaches the protected-content provider only after an `ALLOW` decision |
 | Deny User B's resource in the backend | `bob-payroll-001` returns `DENY_OWNER_MISMATCH`; its provider read count remains `0` |
 | Record human, Agent, action, resource, decision | Persisted decision/outcome events are rendered in the UI |
-| Demonstrate a real Agent Run | Implemented path: Codex CLI in a disposable Runtime container, connected to Volcengine Ark. Final live Codex/Ark evidence remains pending in the submission checklist. |
+| Demonstrate a real Agent Run | Implemented path: Codex CLI in a disposable Runtime container, connected to TokenDance's Responses API with `deepseek-v4-flash-0731`. Final live evidence remains pending in the submission checklist. |
 
 Revocation, same-Passport denial, signed policy commitments, and the fresh
 rehearsal workflow are additional PrincipalLatch capabilities, not organizer
@@ -78,7 +78,7 @@ flowchart LR
     PB -->|"short-lived Passport"| CX
     CP -->|"per-Agent workspace + Codex home"| CX
     TOOL -->|"Passport + resource ID"| GW
-    CX --> ARK["Volcengine Ark"]
+    CX --> TD["TokenDance Responses API<br/>DeepSeek V4 Flash"]
 ```
 
 The only profile supported for PrincipalLatch security claims is:
@@ -138,9 +138,9 @@ Requirements:
 - Node.js 22+ and npm;
 - a running Docker-compatible or Podman engine (Docker Desktop, Colima, or
   Podman are suitable local choices);
-- a Volcengine Ark API key and a Responses-compatible endpoint/model ID.
+- a TokenDance API key with access to `deepseek-v4-flash-0731`.
 
-No Ark or signing key is committed to the repository.
+No model API key or signing key is committed to the repository.
 
 Install dependencies:
 
@@ -151,8 +151,8 @@ npm ci
 Set the three required values. PowerShell:
 
 ```powershell
-$env:ARK_API_KEY = "your-scoped-competition-key"
-$env:ARK_MODEL = "ep-your-endpoint-id"
+$env:MODEL_API_KEY = "your-scoped-competition-key"
+$env:MODEL_ID = "deepseek-v4-flash-0731"
 $env:APP_AUTH_TOKEN = "use-24-plus-random-url-safe-characters"
 npm run poc
 ```
@@ -160,8 +160,8 @@ npm run poc
 Bash:
 
 ```bash
-export ARK_API_KEY=your-scoped-competition-key
-export ARK_MODEL=ep-your-endpoint-id
+export MODEL_API_KEY=your-scoped-competition-key
+export MODEL_ID=deepseek-v4-flash-0731
 export APP_AUTH_TOKEN=use-24-plus-random-url-safe-characters
 npm run poc
 ```
@@ -216,7 +216,7 @@ npm run verify:demo
 Mandate, audit, Alice allow, Bob deny, and revocation denial. Its output
 explicitly reports `mode=middleware-verification-no-model` and
 `liveAgentRun=false`. It is useful evidence, but it does **not** satisfy the
-official real-Agent requirement. Only the `npm run poc` Codex + Ark flow does.
+official real-Agent requirement. Only the `npm run poc` Codex + TokenDance flow does.
 
 Tests cover malformed/tampered/expired/inactive Passports, Mandate
 signature/binding/lifecycle/profile failures, cross-owner denial before content
@@ -247,7 +247,7 @@ scripts/generate-architecture-pdf.py  Reproducible architecture-artifact source
 - Alice's browser session and Bob's server-side resource-owner principal are
   fixtures, not authenticated accounts. The protected documents are randomly
   generated mock canaries, not real data.
-- The Runtime has outbound access for Ark and the Gateway; there is no egress
+- The Runtime has outbound access for TokenDance and the Gateway; there is no egress
   allowlist. The Gateway has an in-memory per-IP limit (120 requests/minute by
   default), not a distributed abuse-prevention service.
 - Authorized content is returned to the Agent and may persist in Agent output,

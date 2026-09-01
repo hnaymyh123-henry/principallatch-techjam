@@ -46,7 +46,7 @@ flowchart LR
     RUN -->|"one turn + per-Agent mounts"| AG
     PS -->|"Passport environment"| AG
     TOOL -->|"resource ID + AgentPassport"| GW
-    AG -->|"model inference"| ARK["Volcengine Ark"]
+    AG -->|"model inference"| TD["TokenDance Responses API<br/>DeepSeek V4 Flash"]
     GW -->|"403 or authorized content"| TOOL
 ```
 
@@ -99,7 +99,7 @@ revoked Mandate.
 | Passport/Mandate signing seeds | Yes | No | Not returned |
 | Current Mandate, Resource Catalog, protected-content file | Yes | No | Safe summaries/catalog metadata only |
 | Raw Agent Passport | Issued here | Environment | Application exposes only `jti`, expiry, SHA-256 commitment |
-| Ark key | Launch source | Environment | Redacted from captured application output |
+| Model API key | Launch source | Environment | Redacted from captured application output |
 | Per-Agent workspace/Codex home | Selected paths | Mounted | Persistent; may contain authorized content |
 | Authorized Alice content | Provider | Returned after allow | May persist in Agent output/state; mock data only |
 

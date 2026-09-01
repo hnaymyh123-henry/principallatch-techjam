@@ -180,10 +180,17 @@ credential.
 
 ## Submission links and final evidence
 
-- Public repository: **pending public visibility** —
+- Public repository: **public** —
   `https://github.com/hnaymyh123-henry/principallatch-techjam`
-- Final submitted commit: **pending**
-- Public YouTube demo, `03:00` or shorter: **pending**
+  (anonymous clone/read verified 2026-09-01 on commit `2e85d9d`)
+- Final submitted commit: **pending final submission** — runtime evidence
+  commit `2e85d9d14b4b6033f65a9fc449955183cbbb794e`; reference the `main`
+  HEAD at submission time
+- Public YouTube demo, `03:00` or shorter: **pending user-authorized upload**
+  — local master `PrincipalLatch_TechJam_Demo_2m55s.mp4` verified at `2:55`
+  (h264 + aac via `ffprobe`; full-length frame sweep found no secrets);
+  corrected English SRT sidecar:
+  [`output/demo/PrincipalLatch_Demo_EN_final.srt`](../output/demo/PrincipalLatch_Demo_EN_final.srt)
 - One-page architecture:
   [`PrincipalLatch_Architecture_One_Page.pdf`](../output/pdf/PrincipalLatch_Architecture_One_Page.pdf)
 - Originality and prior-work disclosure: [`PREEXISTING.md`](../PREEXISTING.md)

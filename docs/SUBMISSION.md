@@ -215,46 +215,77 @@ negative tests, and delivery materials. Full disclosure is in
 
 ### Code and reproducibility
 
-- [ ] Record the submitted commit SHA and confirm the working tree is clean.
-- [ ] `npm ci` succeeds from a fresh checkout.
-- [ ] `npm run check` passes on the submitted commit; save complete output.
-- [ ] `npm run verify:demo` passes and reports
-      `middleware-verification-no-model` / `liveAgentRun=false`.
-- [ ] `npm audit --omit=dev` has no unresolved high/critical finding, or each
-      remaining finding is accurately disclosed.
-- [ ] Review committed files and captured application output for model/app tokens,
-      signing seeds, raw Passports, and generated canaries.
+- [x] Record the submitted commit SHA and confirm the working tree is clean.
+      Runtime evidence commit:
+      `2e85d9d14b4b6033f65a9fc449955183cbbb794e`
+      ("Adopt TokenDance Responses provider for the isolated Codex Runtime").
+      The delivery commit that adds this checklist update and the demo-video
+      assets follows it on `main`; after that commit the working tree is clean
+      except intentionally untracked internal handoff notes.
+- [x] `npm ci` succeeds from a fresh checkout (clean-room anonymous clone of
+      `2e85d9d`, 2026-09-01; install completed with `0` vulnerabilities).
+- [x] `npm run check` passes on the submitted commit (clean-room clone of
+      `2e85d9d`, 2026-09-01: core tests `6/6`, server tests `77/77`, web
+      tests `2/2`, launcher tests `5/5`, typechecks and production builds,
+      `30` local links across `13` Markdown files).
+- [x] `npm run verify:demo` passes and reports
+      `middleware-verification-no-model` / `liveAgentRun=false`
+      (`auditEvents=7`, `bobProviderReads=0`).
+- [x] `npm audit --omit=dev --audit-level=high` reported `0` vulnerabilities.
+- [x] Review committed files and captured application output for model/app
+      tokens, signing seeds, raw Passports, and generated canaries
+      (repository scans on `2e85d9d` plus a full-length 17-frame visual sweep
+      of the final demo video on 2026-09-01 found none).
 
 ### Official live proof
 
-- [ ] Start the security-supported profile with `npm run poc`.
-- [ ] A real Codex + TokenDance Turn 1 produces Alice allow/success and Bob backend
-      deny/not-attempted with zero Bob successes.
-- [ ] Revocation plus real Turn 2 produces a same-Passport lifecycle denial while
-      TTL remains positive.
-- [ ] Capture final Run IDs, commit SHA, model endpoint label, engine, timestamp,
-      Passport commitments, and audit screenshots without exposing secrets.
-- [ ] Rehearse and record the final real-Agent demo at three minutes or less.
-- [ ] Verify the exported video is at most `03:00`, contains English narration
-      or English captions, and exposes no secret, raw Passport, or mock content.
+- [x] Start the security-supported profile with `npm run poc`
+      (WSL2 rootless Podman `5.8.6` profile, 2026-09-01).
+- [x] A real Codex + TokenDance Turn 1 produces Alice allow/success and Bob
+      backend deny/not-attempted with zero Bob successes
+      (Run `9ab7d9b3-6995-41b3-973d-008772856894`; mandate successor
+      `3c48ed1a-2696-4ccc-b558-2d89f412237b`; verified against persisted
+      state: `DENY_OWNER_MISMATCH`, Bob provider reads `0`).
+- [x] Revocation plus real Turn 2 produces a same-Passport lifecycle denial
+      while TTL remains positive
+      (Run `8cf167b1-979d-4895-afbe-26baeb3944d0`,
+      `DENY_MANDATE_LIFECYCLE / not_attempted`, mandate `status=revoked`,
+      `samePassportActive=true`).
+- [x] Capture final Run IDs, commit SHA, model endpoint label, engine,
+      timestamp, Passport commitments, and audit screenshots without exposing
+      secrets (TokenDance Responses / `deepseek-v4-flash-0731`; only safe
+      commitment/`jti` references and decision metadata appear in evidence).
+- [x] Rehearse and record the final real-Agent demo at three minutes or less
+      (`PrincipalLatch_TechJam_Demo_2m55s.mp4`, 1920x1080 @ 30 fps, `2:55`).
+- [x] Verify the exported video is at most `03:00`, contains English narration
+      or English captions, and exposes no secret, raw Passport, or mock
+      content (`ffprobe`: h264 + aac, `175.08` s; full-length 17-frame visual
+      sweep clean; corrected 40-cue English SRT sidecar at
+      [`output/demo/PrincipalLatch_Demo_EN_final.srt`](../output/demo/PrincipalLatch_Demo_EN_final.srt)).
 - [ ] Upload the final video to YouTube as **Public** and verify anonymous
-      playback from its Devpost URL.
+      playback from its Devpost URL. — pending user-authorized upload.
 
 ### Delivery
 
-- [ ] Make the candidate repository public and verify anonymous clone/read:
-      **https://github.com/hnaymyh123-henry/principallatch-techjam** (currently
-      private).
-- [ ] Add final submitted commit: **pending**.
+- [x] Make the candidate repository public and verify anonymous clone/read:
+      **https://github.com/hnaymyh123-henry/principallatch-techjam**
+      (public since 2026-09-01; anonymous page/API access and anonymous
+      `git clone` verified against `2e85d9d`).
+- [ ] Add final submitted commit: runtime evidence commit
+      `2e85d9d14b4b6033f65a9fc449955183cbbb794e` plus the delivery commit on
+      `main`; the Devpost entry must reference the `main` HEAD at submission
+      time. — pending final submission.
 - [x] Export/verify the one-page architecture artifact (one-page PDF plus PNG;
       visually checked after Poppler rendering).
 - [ ] Add the public YouTube demo URL and verify it plays without login:
-      **pending**.
-- [ ] Verify the public repository provides a free test build/path for judges:
-      `npm run verify:demo` without credentials and the documented `npm run poc`
-      real-Agent path with a scoped model credential.
-- [ ] Do not claim public cloud unless a separately isolated deployment and
-      fresh end-to-end smoke test are actually completed.
+      **pending user-authorized upload**.
+- [x] Verify the public repository provides a free test build/path for judges:
+      `npm run verify:demo` without credentials (verified on a clean-room
+      anonymous clone) and the documented `npm run poc` real-Agent path with a
+      scoped model credential.
+- [x] Do not claim public cloud unless a separately isolated deployment and
+      fresh end-to-end smoke test are actually completed. (No public cloud
+      deployment is claimed anywhere in the submission copy.)
 
 ### Post-competition
 

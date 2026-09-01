@@ -36,7 +36,7 @@ The source of truth is the organizer's
 | Allow User A's mock resource | `alice-doc-001` reaches the protected-content provider only after an `ALLOW` decision |
 | Deny User B's resource in the backend | `bob-payroll-001` returns `DENY_OWNER_MISMATCH`; its provider read count remains `0` |
 | Record human, Agent, action, resource, decision | Persisted decision/outcome events are rendered in the UI |
-| Demonstrate a real Agent Run | Implemented path: Codex CLI in a disposable Runtime container, connected to TokenDance's Responses API with `deepseek-v4-flash-0731`. Final live evidence remains pending in the submission checklist. |
+| Demonstrate a real Agent Run | Verified locally: Codex CLI ran inside a disposable rootless Podman Runtime through TokenDance's Responses API with `deepseek-v4-flash-0731`. The final 2:55 video uses explicitly labelled recorded evidence and passed local verification (`ffprobe` streams/duration plus a full-length frame sweep for secrets). |
 
 Revocation, same-Passport denial, signed policy commitments, and the fresh
 rehearsal workflow are additional PrincipalLatch capabilities, not organizer
@@ -196,7 +196,9 @@ During the demo:
    commitment and `jti`, plus the audit's human, Agent, action, resource, and
    decision fields.
 
-Use [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) as the operator cue card.
+Use [docs/DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) as the operator cue card for a
+fresh run. The edited 2:55 submission video follows
+[docs/DEMO_VIDEO_SCRIPT.md](docs/DEMO_VIDEO_SCRIPT.md).
 
 ## Verification
 
@@ -234,6 +236,7 @@ docs/ARCHITECTURE_ONE_PAGE.md  Required one-page trust-boundary view
 output/pdf/PrincipalLatch_Architecture_One_Page.pdf  Judge-ready one-page PDF
 output/pdf/PrincipalLatch_Architecture_One_Page.png  Judge-ready high-resolution image
 docs/DEMO_SCRIPT.md            Three-minute live-demo cue card
+docs/DEMO_VIDEO_SCRIPT.md      Final 2:55 edited-video narration and shot plan
 docs/SUBMISSION.md             Submission copy and final evidence gates
 docs/DEVPOST_SUBMISSION.md     Ready-to-paste English Devpost fields and testing instructions
 PREEXISTING.md                 Organizer/pre-existing work disclosure
